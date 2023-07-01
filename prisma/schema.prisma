@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Card {
+  id         Int     @id(map: "Cards_pk") @default(autoincrement())
+  question   String
+  answer     String
+  deckId     Int
+  isFavorite Boolean @default(false)
+  box        Int     @default(1)
+  decks      Deck    @relation(fields: [deckId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Cards_fk0")
+  plays      Play[]
+
+  @@map("cards")
+}
+
+model Deck {
+  id          Int     @id(map: "Decks_pk") @default(autoincrement())
+  title       String  @unique
+  description String?
+  userId      Int
+  cards       Card[]
+  users       User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Decks_fk0")
+
+  @@map("decks")
+}
+
+model Play {
+  id        Int      @id(map: "Plays_pk") @default(autoincrement())
+  cardId    Int
+  isCorrect Boolean
+  date      DateTime @default(now()) @db.Timestamp(6)
+  cards     Card     @relation(fields: [cardId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Plays_fk0")
+
+  @@map("plays")
+}
+
+model User {
+  id       Int     @id(map: "Users_pk") @default(autoincrement())
+  name     String
+  username String  @unique
+  password String
+  image    String?
+  decks    Deck[]
+
+  @@map("users")
+}
