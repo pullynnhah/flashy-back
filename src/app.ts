@@ -4,13 +4,14 @@ import "express-async-errors";
 import cors from "cors";
 import express, { Express, json } from "express";
 
-import { connectDB } from "./database/database";
+import { connectDB } from "./database";
+import { errorHandler } from "./middlewares";
+import { authRouter } from "./routes";
 
 const app = express();
 const { PORT } = process.env;
 
-app.use(cors());
-app.use(json());
+app.use(cors()).use(json()).use(authRouter).use(errorHandler);
 
 function init(): Promise<Express> {
   connectDB();
